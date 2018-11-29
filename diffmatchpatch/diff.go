@@ -200,7 +200,7 @@ func (dmp *DiffMatchPatch) diffLineMode(text1, text2 []rune, deadline time.Time)
 	// Convert the diff back to original text.
 	diffs = dmp.DiffCharsToLines(diffs, linearray)
 	// Eliminate freak matches (e.g. blank lines)
-	diffs = dmp.DiffCleanupSemantic(diffs)
+	diffs = dmp.DiffCleanupSemanticLossless(diffs)
 
 	// Rediff any replacement blocks, this time character-by-character.
 	// Add a dummy entry at the end.
