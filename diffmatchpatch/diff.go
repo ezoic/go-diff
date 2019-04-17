@@ -190,6 +190,10 @@ func (dmp *DiffMatchPatch) diffCompute(text1, text2 []rune, checklines bool, dea
 	return dmp.diffBisect(text1, text2, deadline)
 }
 
+func (dmp *DiffMatchPatch) DiffLineMode(text1, text2 []rune, deadline time.Time) []Diff {
+	return dmp.diffLineModeSimple(text1, text2, deadline)
+}
+
 // diffLineMode does a quick line-level diff on both []runes, then rediff the parts for greater accuracy. This speedup can produce non-minimal diffs.
 func (dmp *DiffMatchPatch) diffLineMode(text1, text2 []rune, deadline time.Time) []Diff {
 	// Scan the text on a line-by-line basis first.
@@ -246,6 +250,19 @@ func (dmp *DiffMatchPatch) diffLineMode(text1, text2 []rune, deadline time.Time)
 	}
 
 	return diffs[:len(diffs)-1] // Remove the dummy entry at the end.
+}
+
+// diffLineMode does a quick line-level diff on both []runes, then rediff the parts for greater accuracy. This speedup can produce non-minimal diffs.
+func (dmp *DiffMatchPatch) diffLineModeSimple(text1, text2 []rune, deadline time.Time) []Diff {
+	// Scan the text on a line-by-line basis first.
+	text1, text2, linearray := dmp.diffLinesToRunes(text1, text2)
+
+	diffs := dmp.diffMainRunes(text1, text2, false, deadline)
+
+	// Convert the diff back to original text.
+	diffs = dmp.DiffCharsToLines(diffs, linearray)
+
+	return diffs
 }
 
 // DiffBisect finds the 'middle snake' of a diff, split the problem in two and return the recursively constructed diff.
